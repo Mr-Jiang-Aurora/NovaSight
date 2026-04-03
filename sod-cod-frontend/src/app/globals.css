@@ -1,0 +1,170 @@
+@import "tailwindcss";
+
+:root {
+  /* 背景层级 */
+  --bg-0: #0f0f0f;
+  --bg-1: #1a1a1a;
+  --bg-2: #222222;
+  --bg-3: #2a2a2a;
+
+  /* 文字层级 */
+  --text-0: #e8e6df;
+  --text-1: #c2c0b6;
+  --text-2: #888780;
+  --text-3: #555450;
+
+  /* 边框 */
+  --border: #2a2a2a;
+  --border-hover: #3d3d3a;
+  --border-active: #555450;
+
+  /* 强调色 */
+  --accent: #c8b560;
+  --accent-dim: rgba(200, 181, 96, 0.12);
+
+  /* Agent 颜色 */
+  --agent1: #3b82f6;
+  --agent1-bg: rgba(59, 130, 246, 0.08);
+  --agent2: #10b981;
+  --agent2-bg: rgba(16, 185, 129, 0.08);
+  --agent3: #f59e0b;
+  --agent3-bg: rgba(245, 158, 11, 0.08);
+  --agent4: #8b5cf6;
+  --agent4-bg: rgba(139, 92, 246, 0.08);
+
+  /* shadcn 变量覆盖 */
+  --background: 0 0% 6%;
+  --foreground: 40 8% 91%;
+  --card: 0 0% 10%;
+  --card-foreground: 40 8% 91%;
+  --popover: 0 0% 10%;
+  --popover-foreground: 40 8% 91%;
+  --primary: 43 55% 69%;
+  --primary-foreground: 0 0% 6%;
+  --secondary: 0 0% 15%;
+  --secondary-foreground: 40 8% 91%;
+  --muted: 0 0% 15%;
+  --muted-foreground: 40 5% 53%;
+  --accent-shadcn: 43 55% 69%;
+  --accent-foreground: 0 0% 6%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 40 8% 91%;
+  --border-shadcn: 0 0% 17%;
+  --input: 0 0% 17%;
+  --ring: 43 55% 69%;
+  --radius: 0.5rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-0);
+  color: var(--text-0);
+  font-family: 'JetBrains Mono', 'Fira Code', 'Menlo', 'Consolas', monospace;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 滚动条 */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-1);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bg-3);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-active);
+}
+
+/* Markdown 渲染样式 */
+.md-content {
+  color: var(--text-1);
+  line-height: 1.8;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.9rem;
+}
+.md-content h1, .md-content h2, .md-content h3 {
+  color: var(--text-0);
+  font-family: 'JetBrains Mono', monospace;
+  border-bottom: 0.5px solid var(--border);
+  padding-bottom: 6px;
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+.md-content h1 { font-size: 1.4rem; }
+.md-content h2 { font-size: 1.2rem; }
+.md-content h3 { font-size: 1rem; }
+.md-content code {
+  background: var(--bg-2);
+  border: 0.5px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 0.85em;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--accent);
+}
+.md-content pre {
+  background: var(--bg-2);
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  overflow-x: auto;
+  margin: 12px 0;
+}
+.md-content pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text-1);
+}
+.md-content table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+.md-content th {
+  background: var(--bg-2);
+  color: var(--text-0);
+  font-weight: 500;
+  padding: 8px 12px;
+  border: 0.5px solid var(--border);
+  text-align: left;
+}
+.md-content td {
+  padding: 7px 12px;
+  border: 0.5px solid var(--border);
+  color: var(--text-1);
+}
+.md-content tr:nth-child(even) td { background: var(--bg-1); }
+.md-content blockquote {
+  border-left: 2px solid var(--accent);
+  margin: 10px 0;
+  padding: 6px 14px;
+  background: var(--accent-dim);
+  border-radius: 0 6px 6px 0;
+  color: var(--text-2);
+  font-size: 0.92em;
+}
+.md-content a { color: var(--accent); text-decoration: underline; }
+.md-content ul, .md-content ol {
+  padding-left: 20px;
+  color: var(--text-1);
+}
+.md-content li { margin: 4px 0; }
+.md-content strong { color: var(--text-0); font-weight: 600; }
+.md-content hr {
+  border: none;
+  border-top: 0.5px solid var(--border);
+  margin: 20px 0;
+}
+.md-content p { margin: 8px 0; }
+
+/* 隐藏原生滚动条，配合自定义滚动条使用 */
+.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
