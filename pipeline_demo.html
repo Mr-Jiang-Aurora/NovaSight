@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOD/COD Multi-Agent Research System — Pipeline Demo</title>
+<style>
+/* ── CSS 变量（脱离 Claude 界面独立运行）──────────────────────── */
+:root {
+  --color-background-primary:   #ffffff;
+  --color-background-secondary: #f8f7f4;
+  --color-background-tertiary:  #f1efe8;
+  --color-background-info:      #e6f1fb;
+  --color-background-success:   #eaf3de;
+  --color-background-warning:   #faeeda;
+  --color-background-danger:    #fcebeb;
+  --color-text-primary:         #1a1a18;
+  --color-text-secondary:       #5f5e5a;
+  --color-text-tertiary:        #888780;
+  --color-text-info:            #185fa5;
+  --color-text-success:         #3b6d11;
+  --color-text-warning:         #854f0b;
+  --color-text-danger:          #a32d2d;
+  --color-border-tertiary:      rgba(0,0,0,0.12);
+  --color-border-secondary:     rgba(0,0,0,0.22);
+  --color-border-info:          #378add;
+  --color-border-success:       #639922;
+  --color-border-warning:       #ba7517;
+  --color-border-danger:        #e24b4a;
+  --font-sans:  -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono:  "Menlo", "Consolas", "Courier New", monospace;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background-primary:   #1e1d1b;
+    --color-background-secondary: #27261f;
+    --color-background-tertiary:  #1a1916;
+    --color-background-info:      #042c53;
+    --color-background-success:   #173404;
+    --color-background-warning:   #412402;
+    --color-background-danger:    #501313;
+    --color-text-primary:         #e8e6df;
+    --color-text-secondary:       #b4b2a9;
+    --color-text-tertiary:        #888780;
+    --color-text-info:            #85b7eb;
+    --color-text-success:         #97c459;
+    --color-text-warning:         #ef9f27;
+    --color-text-danger:          #f09595;
+    --color-border-tertiary:      rgba(255,255,255,0.12);
+    --color-border-secondary:     rgba(255,255,255,0.22);
+    --color-border-info:          #185fa5;
+    --color-border-success:       #3b6d11;
+    --color-border-warning:       #854f0b;
+    --color-border-danger:        #a32d2d;
+  }
+}
+
+/* ── 页面基础 ──────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body {
+  margin: 0;
+  padding: 28px 20px 40px;
+  background: var(--color-background-tertiary);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+}
+#wrap {
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+/* ── 页面标题区 ────────────────────────────────────────────────── */
+.page-head {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.page-head h1 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
+}
+.page-head p {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  margin-top: 4px;
+}
+
+/* ── 内嵌 Widget ───────────────────────────────────────────────── */
+*{box-sizing:border-box}
+#app{background:var(--color-background-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;font-family:var(--font-sans);border:0.5px solid var(--color-border-tertiary);box-shadow:0 2px 12px rgba(0,0,0,0.07)}
+.hdr{padding:10px 16px;background:var(--color-background-secondary);border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.hdr-title{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.hdr-badge{font-size:10px;padding:2px 8px;border:0.5px solid var(--color-border-tertiary);border-radius:20px;color:var(--color-text-tertiary)}
+.btns{display:flex;gap:5px;margin-left:auto}
+.btn{font-size:12px;padding:4px 11px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer;font-family:var(--font-sans);transition:background 0.12s}
+.btn:hover:not(:disabled){background:var(--color-background-secondary)}
+.btn:disabled{opacity:0.3;cursor:default}
+.btn-p{background:var(--color-background-info);border-color:var(--color-border-info);color:var(--color-text-info)}
+.cfg{padding:7px 16px;background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.segs{display:flex}
+.seg{font-size:11px;padding:3px 9px;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-secondary);cursor:pointer;font-family:var(--font-sans)}
+.seg:first-child{border-radius:var(--border-radius-md) 0 0 var(--border-radius-md)}
+.seg:last-child{border-radius:0 var(--border-radius-md) var(--border-radius-md) 0}
+.seg.on{background:var(--color-background-info);color:var(--color-text-info);border-color:var(--color-border-info)}
+.tw{display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+.tt{width:28px;height:16px;border-radius:8px;position:relative;transition:background 0.2s;flex-shrink:0}
+.th{position:absolute;top:2px;left:2px;width:12px;height:12px;background:#fff;border-radius:50%;transition:left 0.2s;pointer-events:none}
+.tl{font-size:11px;color:var(--color-text-tertiary)}
+.pw{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.pt{font-size:10px;color:var(--color-text-tertiary)}
+.pb{width:80px;height:2px;background:var(--color-border-tertiary);border-radius:1px;overflow:hidden}
+.pf{height:100%;background:var(--color-border-info);border-radius:1px;transition:width 0.3s}
+.cvw{overflow-x:auto;padding:14px 14px 6px}
+.cv{position:relative;width:840px;height:490px;margin:0 auto}
+.ac{position:absolute;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);background:var(--color-background-primary);padding:8px 10px;transition:border-color 0.22s,background 0.22s;overflow:hidden}
+.ac.skipped{opacity:0.2}
+.act{display:flex;align-items:center;gap:6px;margin-bottom:3px}
+.atag{font-size:9px;font-weight:500;letter-spacing:0.05em;padding:2px 5px;border-radius:4px;flex-shrink:0}
+.aname{font-size:12px;font-weight:500;color:var(--color-text-primary);line-height:1}
+.ast{margin-left:auto;display:flex;align-items:center;gap:3px;font-size:9px;padding:2px 5px;border-radius:20px;background:var(--color-background-secondary);color:var(--color-text-tertiary);white-space:nowrap}
+.adot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.asub{font-size:9px;color:var(--color-text-tertiary);margin-bottom:4px}
+.aitems{font-size:9px;color:var(--color-text-tertiary);line-height:1.45}
+.ib{position:absolute;border:0.5px dashed var(--color-border-secondary);border-radius:var(--border-radius-md);padding:5px 8px;background:var(--color-background-secondary);transition:opacity 0.22s,border-color 0.22s}
+.ib.off{opacity:0.18}
+.ib.hl{border-style:solid;border-color:var(--color-border-info)}
+.ibn{font-size:10px;font-weight:500;color:var(--color-text-secondary);margin-bottom:1px}
+.ibs{font-size:9px;color:var(--color-text-tertiary)}
+.ob{position:absolute;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:8px 14px;background:var(--color-background-primary);display:flex;align-items:center;gap:10px;transition:border-color 0.22s}
+.ob.lit{border-color:var(--color-border-danger)}
+.on2{font-size:11px;font-weight:500;color:var(--color-text-secondary)}
+.os{font-size:9px;color:var(--color-text-tertiary)}
+.ocheck{margin-left:auto;font-size:11px;color:var(--color-text-success);font-weight:500;display:none}
+@keyframes scan{0%{left:-60%}100%{left:120%}}
+@keyframes dp{0%,100%{opacity:1}50%{opacity:0.15}}
+.scan{position:absolute;top:0;bottom:0;left:-60%;width:55%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.05),transparent);animation:scan 1.5s linear infinite;pointer-events:none}
+.dp{padding:12px 16px 14px;background:var(--color-background-primary);border-top:0.5px solid var(--color-border-tertiary);min-height:130px}
+.dp-step{font-size:9px;font-weight:500;padding:1px 6px;border-radius:4px;display:inline-block;margin-bottom:5px}
+.dp-title{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px}
+.dp-detail{font-size:11px;font-family:var(--font-mono);color:var(--color-text-secondary);line-height:1.65;background:var(--color-background-secondary);padding:8px 10px;border-radius:var(--border-radius-md);white-space:pre-wrap;word-break:break-word}
+.dp-empty{font-size:12px;color:var(--color-text-tertiary);text-align:center;padding:40px 0}
+</style>
+</head>
+<body>
+<div id="wrap">
+
+  <!-- 页面标题 -->
+  <div class="page-head">
+    <h1>SOD / COD 多 Agent 科研助手 — 数据流演示</h1>
+    <p>Multi-Agent Research System Pipeline · 一主四专架构 · 点击 Start 开始逐步演示</p>
+  </div>
+
+  <!-- Widget 主体 -->
+  <div id="app">
+    <div class="hdr">
+      <span class="hdr-title">SOD / COD Multi-Agent Research System</span>
+      <span class="hdr-badge">Master + 4 Specialist Agents</span>
+      <div class="btns">
+        <button class="btn" id="bPrev" onclick="sP()" disabled>&#9664;</button>
+        <button class="btn btn-p" id="bPlay" onclick="tP()">&#9654; Start</button>
+        <button class="btn" id="bNext" onclick="sN()">&#9654;</button>
+        <button class="btn" onclick="reset()">&#8635;</button>
+      </div>
+    </div>
+    <div class="cfg">
+      <span style="font-size:11px;color:var(--color-text-tertiary)">Domain</span>
+      <div class="segs">
+        <div class="seg on" id="sgCOD" onclick="setD('COD')">COD</div>
+        <div class="seg" id="sgSOD" onclick="setD('SOD')">SOD</div>
+      </div>
+      <div style="width:0.5px;height:14px;background:var(--color-border-tertiary)"></div>
+      <label class="tw" onclick="tgC()">
+        <div class="tt" id="ttC" style="background:#185fa5"><div class="th" id="thC" style="left:14px"></div></div>
+        <span class="tl" id="tlC" style="color:var(--color-text-info)">Code input</span>
+      </label>
+      <label class="tw" onclick="tgI()">
+        <div class="tt" id="ttI" style="background:var(--color-border-tertiary)"><div class="th" id="thI" style="left:2px"></div></div>
+        <span class="tl" id="tlI">Image input</span>
+      </label>
+      <div class="pw">
+        <span class="pt" id="pTxt">0 / 0</span>
+        <div class="pb"><div class="pf" id="pFill" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <!-- 画布区 -->
+    <div class="cvw">
+    <div class="cv" id="cv">
+    <svg id="svgL" width="840" height="490" style="position:absolute;top:0;left:0;pointer-events:none;overflow:visible">
+    <defs><marker id="mh" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+    </svg>
+
+    <!-- Master -->
+    <div class="ac" id="acM" style="left:182px;top:8px;width:476px;height:58px">
+      <div class="scan" id="scM" style="display:none"></div>
+      <div class="act">
+        <div class="atag" style="background:var(--color-background-info);color:var(--color-text-info)">MASTER</div>
+        <div class="aname">Master Control Agent</div>
+        <div class="ast" id="stM"><div class="adot" id="dtM" style="background:var(--color-border-tertiary)"></div><span id="slM">idle</span></div>
+      </div>
+      <div class="aitems">Workflow planning &middot; SharedContext management &middot; Segmented synthesis (6 sections &times; 8 000 tokens)</div>
+    </div>
+
+    <!-- Image input -->
+    <div class="ib off" id="ibI" style="left:620px;top:72px;width:182px">
+      <div class="ibn">Image Input</div>
+      <div class="ibs">Architecture diagram / comparison figure</div>
+    </div>
+
+    <!-- A1 -->
+    <div class="ac" id="acA1" style="left:14px;top:148px;width:175px;height:116px">
+      <div class="scan" id="scA1" style="display:none"></div>
+      <div class="act">
+        <div class="atag" style="background:var(--color-background-info);color:var(--color-text-info)">A1</div>
+        <div class="aname">SOTA Search</div>
+        <div class="ast" id="stA1"><div class="adot" id="dtA1" style="background:var(--color-border-tertiary)"></div><span id="slA1">idle</span></div>
+      </div>
+      <div class="asub">4-source parallel retrieval</div>
+      <div class="aitems">Semantic Scholar<br>DBLP &middot; CVF &middot; OpenAlex<br>PDF fetch &middot; Table parse<br>Paper info cards (CCF/IF)</div>
+    </div>
+
+    <!-- A2 -->
+    <div class="ac" id="acA2" style="left:248px;top:148px;width:175px;height:116px">
+      <div class="scan" id="scA2" style="display:none"></div>
+      <div class="act">
+        <div class="atag" style="background:var(--color-background-success);color:var(--color-text-success)">A2</div>
+        <div class="aname">Metrics Diagnosis</div>
+        <div class="ast" id="stA2"><div class="adot" id="dtA2" style="background:var(--color-border-tertiary)"></div><span id="slA2">idle</span></div>
+      </div>
+      <div class="asub">12-dimensional ranking</div>
+      <div class="aitems">3 datasets &times; 4 metrics<br>Saturation analysis<br>Deep report 6-section<br>Quality check + retry</div>
+    </div>
+
+    <!-- A4 -->
+    <div class="ac" id="acA4" style="left:620px;top:148px;width:182px;height:116px">
+      <div class="scan" id="scA4" style="display:none"></div>
+      <div class="act">
+        <div class="atag" style="background:var(--color-background-warning);color:var(--color-text-warning)">A4</div>
+        <div class="aname">Vision Analysis</div>
+        <div class="ast" id="stA4"><div class="adot" id="dtA4" style="background:var(--color-border-tertiary)"></div><span id="slA4">idle</span></div>
+      </div>
+      <div class="asub">6-dimension arch parsing</div>
+      <div class="aitems">Figure auto-tracing<br>Innovation evaluation<br>structure_hint &rarr; A3<br>Claude Vision 8 k tok</div>
+    </div>
+
+    <!-- Code input -->
+    <div class="ib off" id="ibC" style="left:14px;top:350px;width:175px">
+      <div class="ibn">Code Input</div>
+      <div class="ibs">GitHub URL / local file upload</div>
+    </div>
+
+    <!-- A3 -->
+    <div class="ac" id="acA3" style="left:248px;top:300px;width:175px;height:134px">
+      <div class="scan" id="scA3" style="display:none"></div>
+      <div class="act">
+        <div class="atag" style="background:var(--color-background-warning);color:var(--color-text-warning)">A3</div>
+        <div class="aname">Code Analysis</div>
+        <div class="ast" id="stA3"><div class="adot" id="dtA3" style="background:var(--color-border-tertiary)"></div><span id="slA3">idle</span></div>
+      </div>
+      <div class="asub">5 000-line context window</div>
+      <div class="aitems">AST static analysis<br>Claude semantic (6 rules)<br>Arch &harr; code validation<br>&ge;8 suggestions w/ estimates</div>
+    </div>
+
+    <!-- Output -->
+    <div class="ob" id="outB" style="left:182px;top:452px;width:476px">
+      <div>
+        <div class="on2">Final Report</div>
+        <div class="os">master_report.md &middot; 6 sections &middot; 23 000+ chars &middot; structured JSON</div>
+      </div>
+      <div class="ocheck" id="outOK">Done ✓</div>
+    </div>
+
+    </div><!-- .cv -->
+    </div><!-- .cvw -->
+
+    <!-- 详情面板 -->
+    <div class="dp" id="detP"><div class="dp-empty">Click Start to step through the data pipeline</div></div>
+  </div><!-- #app -->
+
+</div><!-- #wrap -->
+
+<script>
+var S={hC:true,hI:false,dom:'COD',idx:-1,play:false,tmr:null};
+var COL={M:'#185fa5',A1:'#185fa5',A2:'#3b6d11',A3:'#854f0b',A4:'#854f0b'};
+var BG={M:'rgba(24,95,165,0.05)',A1:'rgba(24,95,165,0.05)',A2:'rgba(99,153,34,0.05)',A3:'rgba(186,117,23,0.05)',A4:'rgba(186,117,23,0.05)'};
+var STEPS=[];
+
+function bSteps(hc,hi){
+  var d=S.dom,ss=[];
+  ss.push({ph:'idle',active:[],flows:[],
+    t:'System ready — awaiting user input',
+    x:'Domain: '+d+'\nCode input:  '+(hc?'GitHub URL / local upload  [active]':'[disabled — Agent 3 will be skipped]')+
+       '\nImage input: '+(hi?'Architecture diagram / comparison figure  [active]':'[disabled — Agent 4 will be skipped]')+
+       '\n\nMaster Agent will plan the workflow and dispatch specialist agents.'});
+  ss.push({ph:'M',active:['M'],flows:['md'],
+    t:'Master Agent — workflow planning',
+    x:'WorkflowPlanner.plan():\n  A1 SOTA Search      always run\n  A2 Metrics Diag     always run\n'+
+      '  A3 Code Analysis    '+(hc?'active  (code input detected)':'skipped (no code input)')+'\n'+
+      '  A4 Vision Analysis  '+(hi?'active  (image input detected)':'skipped (no image input)')+'\n\n'+
+      'SharedContext initialised  session_id='+d.toLowerCase()+'_'+new Date().toISOString().slice(0,10)});
+  ss.push({ph:'A1',active:['M','A1'],flows:['m_a1'],
+    t:'Agent 1 — multi-source parallel search',
+    x:'SearchOrchestrator (4 concurrent sources):\n'+
+      '  Semantic Scholar   full-text + citation graph + open access PDF\n'+
+      '  DBLP               venue-structured bibliography\n'+
+      '  CVF                CVPR / ICCV open-access index\n'+
+      '  OpenAlex           open metadata + citation counts\n\n'+
+      'Filters: year >= 2024   tier: CCF-A / SCI Q1\n'+
+      'Result: ~313 raw papers  →  68 after dedup + filter'});
+  ss.push({ph:'A1',active:['A1'],flows:[],
+    t:'Agent 1 — PDF acquisition and table extraction',
+    x:'Phase 2  PDF acquisition (5-level waterfall):\n'+
+      '  ar5iv → Unpaywall → CORE API → Sci-Hub fallback → skip\n'+
+      '  Success rate: 51.5%  (35 / 68 papers)\n\n'+
+      'Phase 3  Table extraction (4-tier pipeline):\n'+
+      '  A  ar5iv HTML parse          (fastest, ~75% coverage)\n'+
+      '  B  PyMuPDF rule-based        (standard bordered tables)\n'+
+      '  C  Docling deep parse        (booktabs, 97.9% accuracy)\n'+
+      '  D  Claude VLM fallback       (rotated / image-embedded)\n\n'+
+      'Manual supplement: 16 papers (Excel import) → 25 papers with metrics'});
+  ss.push({ph:'A1',active:['A1'],flows:[],
+    t:'Agent 1 — paper info cards generated',
+    x:'PaperCardWriter  →  paper_cards_'+d+'.md\n\n'+
+      'Grouped by: CCF-A | CCF-B | SCI Q1 | other\n\n'+
+      'Fields per paper:\n'+
+      '  title, venue (full name), year, CCF rank, CAS tier,\n'+
+      '  impact factor (2023), abstract excerpt\n\n'+
+      'Link types:\n'+
+      '  Open PDF   arXiv   Semantic Scholar   Code repo\n'+
+      '  Paywalled links labelled (IEEE Xplore / Elsevier / Springer)'});
+  ss.push({ph:'A1',active:['A1'],flows:['a1_a2'],
+    t:'Agent 1 complete — SOTALeaderboard transferred to Agent 2',
+    x:'Transfer: SOTALeaderboard('+d+', 68 papers, 25 with metrics) → SharedContext\n\n'+
+      'Outputs saved to cache/agent1/'+new Date().toISOString().slice(0,10)+'/ :\n'+
+      '  fetch_result_'+d+'_*.json\n'+
+      '  paper_cards_'+d+'_*.md\n'+
+      '  failed_extraction_*.md'});
+  ss.push({ph:'A2',active:['A2'],flows:['a1_a2'],
+    t:'Agent 2 — leaderboard construction and gap analysis',
+    x:'Ranker.compute_all_rankings():\n'+
+      '  3 datasets (COD10K / CAMO / NC4K) × 4 metrics (Sm / Em / Fm / MAE)\n'+
+      '  = 12 independent ranked leaderboards\n\n'+
+      'GapAnalyzer:\n'+
+      '  yearly_sota        best value per metric per year (2020–2025)\n'+
+      '  yearly_delta       year-on-year improvement\n'+
+      '  saturation         saturating / active / rapid (per metric)\n'+
+      '  current_range      max − min across all methods\n\n'+
+      'Profiler: rank percentile for each method on each metric'});
+  ss.push({ph:'A2',active:['A2'],flows:[],
+    t:'Agent 2 — deep narrative report (6 sections × 8 000 tokens)',
+    x:'NarrativeGenerator — 6 independently prompted Claude calls:\n'+
+      '  Sec 1  SOTA Precise Baseline       metrics table + YoY progression\n'+
+      '  Sec 2  Top-N Method Comparison     cross-dataset, arch reasoning\n'+
+      '  Sec 3  Metric Saturation           gap values + saturation table\n'+
+      '  Sec 4  Research Opportunities      technical pathways, 2–4 directions\n'+
+      '  Sec 5  Improvement Roadmap         3–6 concrete suggestions w/ code hints\n'+
+      '  Sec 6  Action Checklist            2-week tasks + milestone planning\n\n'+
+      'Constraints: every claim backed by numbers  no filler phrases\n'+
+      '             auto-retry if quality check fails'});
+  var a2f=hc?['a2_a3']:[];
+  ss.push({ph:'A2',active:['A2'],flows:a2f,
+    t:'Agent 2 complete — summary transferred',
+    x:'agent2_summary.txt → SharedContext.agent2_summary\n'+
+      (hc?'  → forwarded to Agent 3 as SOTA context for gap analysis\n':'')+
+      '\nOutputs saved to cache/agent2/'+new Date().toISOString().slice(0,10)+'/ :\n'+
+      '  agent2_report_'+d+'_*.md\n'+
+      '  agent2_report_'+d+'_*.json\n'+
+      '  agent2_summary_'+d+'_*.txt'});
+  if(hi){
+    ss.push({ph:'A4',active:['A4'],flows:['img_a4'],
+      t:'Agent 4 — architecture diagram deep parse (6 dimensions)',
+      x:'ArchAnalyzer  (Claude Vision, max_tokens=8 000):\n\n'+
+        '  Dim 1  Module function + design motivation  (>20 chars each)\n'+
+        '  Dim 2  Data flow: training path vs inference path (separate)\n'+
+        '  Dim 3  Architecture comparison: vs U-Net  vs Transformer-seg\n'+
+        '  Dim 4  Code mapping: file path, class name, key methods\n'+
+        '  Dim 5  Architecture-grounded limitations\n'+
+        '  Dim 6  structure_hint >150 chars for downstream use in Agent 3\n\n'+
+        'Quality check: 6 criteria — auto-retry up to 2 times on failure'});
+    ss.push({ph:'A4',active:['A4'],flows:[],
+      t:'Agent 4 — Figure auto-tracing (TASK 1)',
+      x:'FigureTracer  →  Semantic Scholar Search API (4 concurrent queries):\n\n'+
+        '  Query 1  Module abbreviations, e.g. "ATCN LE camouflaged object detection"\n'+
+        '  Query 2  Backbone name + task keyword\n'+
+        '  Query 3  Uppercase abbreviations extracted from data-flow text\n'+
+        '  Query 4  Fallback: generic domain query\n\n'+
+        'Ranking: title keyword overlap + log(citation_count) + recency bonus\n\n'+
+        'Output: figure_trace.md\n'+
+        '  best match title, authors, year, venue, citation count\n'+
+        '  PDF / arXiv / Semantic Scholar links, confidence rating'});
+    ss.push({ph:'A4',active:['A4'],flows:[],
+      t:'Agent 4 — academic innovation evaluation (TASK 3, 5 dimensions)',
+      x:'InnovationEvaluator  (Claude Vision + SOTA context, 8 000 tokens):\n\n'+
+        '  Dim 1  Innovation level:  Paradigm / Architecture / Incremental / Engineering\n'+
+        '  Dim 2  Core contribution: one sentence, max 50 chars\n'+
+        '  Dim 3  Difference from prior work (first-time-in-COD components)\n'+
+        '  Dim 4  Likely reviewer objections\n'+
+        '  Dim 5  Future research directions enabled\n\n'+
+        'Output: innovation_evaluation.md  (>600 chars)'});
+    var a4f=hc?['a4_a3']:['a4_ret'];
+    ss.push({ph:'A4',active:['A4'],flows:a4f,
+      t:'Agent 4 complete — structure_hint transferred',
+      x:'structure_hint (>150 chars) → SharedContext.structure_hint\n'+
+        (hc?'  → forwarded to Agent 3: guides file selection + Claude prompt\n':
+            '  → forwarded to Master for synthesis\n')+
+        '\nOutputs saved to cache/agent4/'+new Date().toISOString().slice(0,10)+'/ :\n'+
+        '  arch_analysis_*.json  (19 KB typical)\n'+
+        '  figure_trace_*.md\n'+
+        '  innovation_evaluation_*.md'});
+  }
+  if(hc){
+    var a3f=['code_a3','a2_a3'].concat(hi?['a4_a3']:[]);
+    ss.push({ph:'A3',active:['A3'],flows:a3f,
+      t:'Agent 3 — load code and inject context',
+      x:'FileSelector: up to 12 key files, priority order:\n'+
+        '  model_main > loss > decoder > backbone > config > train\n\n'+
+        'Context injected into Claude prompt:\n'+
+        '  SOTA summary from Agent 2   ('+d+' leaderboard + gap data)\n'+
+        (hi?'  structure_hint from Agent 4  (backbone + module mapping)\n':'')+
+        '  Max code context: 5 000 lines across selected files\n\n'+
+        'Input mode: '+(S.hC?'GitHub URL or local directory upload':'')});
+    ss.push({ph:'A3',active:['A3'],flows:[],
+      t:'Agent 3 — AST static analysis',
+      x:'ArchExtractor  (ast.parse, no code execution):\n'+
+        '  Backbone detection  15 standard names via keyword dict\n'+
+        '  Neck detection      FPN / BiFPN / ASPP / PPM variants\n'+
+        '  Custom modules      nn.Module subclasses with innovation-hint names\n\n'+
+        'LossExtractor:\n'+
+        '  14 loss patterns → name + weight coefficient + is_auxiliary flag\n\n'+
+        'ConfigExtractor:\n'+
+        '  YAML / Python → batch_size, lr, optimizer, scheduler, input_size'});
+    ss.push({ph:'A3',active:['A3'],flows:[],
+      t:'Agent 3 — Claude deep semantic analysis (6 mandatory rules)',
+      x:'CodeInterpreter  (max_tokens=8 000, retry up to 2×)\n\n'+
+        'Mandatory output fields:\n'+
+        '  file_analysis[]     per-file role + key classes (with line numbers)\n'+
+        '  loss_analysis       complete formula + per-term weight + source location\n'+
+        '  train_config        bs / lr / optimizer / scheduler / input_size\n'+
+        '  suggestions[]       >= 5 items, each with:\n'+
+        '                        problem (file:line), solution, reference,\n'+
+        '                        code_hint, estimated_gain\n'+
+        '  sota_gap_analysis   predicted Sm range + gap breakdown by component'});
+    if(hi){
+      ss.push({ph:'A3',active:['A3'],flows:[],
+        t:'Agent 3 — architecture-to-code bidirectional validation (TASK 2)',
+        x:'ArchCodeValidator  (4-layer matching strategy):\n'+
+          '  L1  Exact name match              score 100\n'+
+          '  L2  Abbreviation expansion        score 90   e.g. ATCN → AdaptiveTimestepConditioningNetwork\n'+
+          '  L3  Keyword subset match          score 60\n'+
+          '  L4  Substring containment         score 40\n\n'+
+          'Per-module output:\n'+
+          '  status            verified / partial / missing\n'+
+          '  code_location     file : line\n'+
+          '  match_method      method used\n'+
+          '  verification_note detailed explanation\n\n'+
+          'Report: arch_code_validation.md  (includes consistency score %)'});
+    }
+    ss.push({ph:'A3',active:['A3'],flows:['synth'],
+      t:'Agent 3 complete — results transferred to Master',
+      x:'arch_summary (first 300 chars) → SharedContext.agent3_summary\n\n'+
+        'Outputs saved to cache/agent3/'+new Date().toISOString().slice(0,10)+'/ :\n'+
+        '  agent3_report_*.md\n'+
+        '  agent3_report_*.json\n'+
+        '  agent3_summary_*.txt\n'+
+        (hi?'  arch_code_validation_*.md\n':'')+
+        '\nAll paths recorded in SharedContext.output_paths'});
+  }
+  ss.push({ph:'M',active:['M'],flows:['synth'],
+    t:'Master Agent — segmented synthesis report (6 × 8 000 tokens)',
+    x:'SynthesisGenerator — 6 sequential Claude calls:\n\n'+
+      '  Sec 1  SOTA Precise Baseline       SOTA table + year-on-year progression\n'+
+      '  Sec 2  Top-N Method Comparison     per-method cross-dataset analysis + arch reasoning\n'+
+      '  Sec 3  Code Architecture Diagnosis '+(hc?'from Agent 3 file-level analysis':'generic best-practice guidance')+'\n'+
+      '  Sec 4  Gap Quantification          performance estimate + gap by component\n'+
+      '  Sec 5  Improvement Roadmap         >= 6 suggestions, 7-element each\n'+
+      '  Sec 6  Action Checklist            >= 10 tasks + 3-month milestone plan\n\n'+
+      'Total: ~24 000 tokens  |  ~23 000 chars  |  ~72 KB'});
+  ss.push({ph:'OUT',active:['M','OUT'],flows:['out'],
+    t:'Complete — final report written to disk',
+    x:'master_report_*.md         72 KB  human-readable\n'+
+      'master_report_*.json       structured JSON:\n'+
+      '  meta          session_id, agents_run, total_time_s, word_count\n'+
+      '  sections      {key: "## Heading\\n\\ncontent..."}  (6 entries)\n'+
+      '  agent_status  {done: bool, error: str}  per agent\n'+
+      '  all_sub_outputs  paths to every sub-agent report\n\n'+
+      'Location: cache/master/'+new Date().toISOString().slice(0,10)+'/'});
+  return ss;
+}
+
+function bArrows(hc,hi){
+  return [
+    {id:'m_a1',  d:'M 280 66 C 280 104 101 108 101 148', base:true},
+    {id:'m_a2',  d:'M 420 66 C 420 104 335 108 335 148', base:true},
+    {id:'m_a4',  d:'M 590 66 C 590 104 720 108 720 148', base:false, si:hi},
+    {id:'a1_a2', d:'M 189 206 L 248 206', base:true},
+    {id:'a2_a3', d:'M 335 264 L 335 300', base:false, si:hc},
+    {id:'a4_a3', d:'M 711 264 C 711 290 423 290 423 300', base:false, si:hc&&hi},
+    {id:'code_a3',d:'M 189 365 L 248 365', base:false, si:hc},
+    {id:'img_a4', d:'M 720 117 L 720 148', base:false, si:hi},
+    {id:'a2_ret', d:'M 335 148 C 335 104 420 86 420 66', base:true, ret:true},
+    {id:'a3_ret', d:'M 335 300 C 335 260 420 180 420 66', base:false, si:hc, ret:true},
+    {id:'a4_ret', d:'M 720 148 C 720 104 590 86 590 66', base:false, si:hi&&!hc, ret:true},
+    {id:'synth',  d:'M 420 66 L 420 452', base:true},
+    {id:'out',    d:'M 420 452 L 420 452', base:true},
+  ];
+}
+
+var ARROWS=[];
+
+function init(){
+  STEPS=bSteps(S.hC,S.hI);
+  ARROWS=bArrows(S.hC,S.hI);
+  riBadges();
+  rCards(-1);
+  rArrows([]);
+  rDetail(-1);
+  uBtns();
+}
+
+function riBadges(){
+  document.getElementById('ibC').className='ib'+(S.hC?'':' off');
+  document.getElementById('ibI').className='ib'+(S.hI?'':' off');
+}
+
+function rArrows(aIds){
+  var svg=document.getElementById('svgL');
+  svg.querySelectorAll('.ap,.fd').forEach(function(e){e.remove()});
+  ARROWS.forEach(function(a){
+    if(!a.base && !a.si) return;
+    var act=aIds.indexOf(a.id)>=0;
+    var p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d',a.d);p.setAttribute('fill','none');
+    var sc=act?(a.ret?'#3b6d11':'#185fa5'):'var(--color-border-secondary)';
+    p.setAttribute('stroke',sc);
+    p.setAttribute('stroke-width',act?'1.5':'0.55');
+    p.setAttribute('stroke-opacity',act?'0.85':'0.28');
+    if(!act) p.setAttribute('stroke-dasharray','4 3');
+    if(!a.ret) p.setAttribute('marker-end','url(#mh)');
+    p.setAttribute('class','ap');
+    svg.appendChild(p);
+    if(act){
+      var dot=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      dot.setAttribute('r','4');dot.setAttribute('fill',a.ret?'#3b6d11':'#185fa5');
+      dot.setAttribute('opacity','0.9');dot.setAttribute('class','fd');
+      var am=document.createElementNS('http://www.w3.org/2000/svg','animateMotion');
+      am.setAttribute('dur',a.ret?'1.9s':'1.4s');am.setAttribute('repeatCount','indefinite');
+      am.setAttribute('path',a.d);dot.appendChild(am);svg.appendChild(dot);
+    }
+  });
+}
+
+var AKEYS=['M','A1','A2','A3','A4'];
+function rCards(idx){
+  var step=idx>=0?STEPS[idx]:null;
+  var active=step?(step.active||[]):[];
+  var ever={};
+  if(idx>=0) STEPS.slice(0,idx+1).forEach(function(s){(s.active||[]).forEach(function(k){ever[k]=true})});
+  var will={};
+  STEPS.forEach(function(s){(s.active||[]).forEach(function(k){will[k]=true})});
+
+  AKEYS.forEach(function(k){
+    var el=document.getElementById('ac'+k);
+    var sc=document.getElementById('sc'+k);
+    var stEl=document.getElementById('st'+k);
+    var dtEl=document.getElementById('dt'+k);
+    var slEl=document.getElementById('sl'+k);
+    if(!el) return;
+    var isAct=active.indexOf(k)>=0;
+    var wasDone=!isAct&&ever[k];
+    var skipped=!will[k];
+    el.className='ac'+(skipped?' skipped':'');
+    if(isAct){el.style.borderColor=COL[k]||'#185fa5';el.style.borderWidth='1px';el.style.background=BG[k]||'';}
+    else{el.style.borderColor='var(--color-border-tertiary)';el.style.borderWidth='0.5px';el.style.background='var(--color-background-primary)';}
+    if(sc) sc.style.display=isAct?'block':'none';
+    var cfg=isAct?{bg:BG[k],c:COL[k],dot:COL[k],txt:'running'}:
+            wasDone?{bg:'var(--color-background-success)',c:'var(--color-text-success)',dot:'var(--color-text-success)',txt:'done'}:
+            skipped?{bg:'var(--color-background-secondary)',c:'var(--color-text-tertiary)',dot:'var(--color-border-tertiary)',txt:'skip'}:
+                    {bg:'var(--color-background-secondary)',c:'var(--color-text-tertiary)',dot:'var(--color-border-tertiary)',txt:'idle'};
+    if(stEl){stEl.style.background=cfg.bg;stEl.style.color=cfg.c;}
+    if(dtEl){dtEl.style.background=cfg.dot;dtEl.style.animation=isAct?'dp 0.9s infinite':'none';}
+    if(slEl) slEl.textContent=cfg.txt;
+  });
+
+  var ob=document.getElementById('outB'),ok=document.getElementById('outOK');
+  var outDone=idx>=0&&STEPS.slice(0,idx+1).some(function(s){return s.ph==='OUT'});
+  if(ob) ob.className='ob'+(outDone?' lit':'');
+  if(ok) ok.style.display=outDone?'block':'none';
+
+  var ibC=document.getElementById('ibC'),ibI=document.getElementById('ibI');
+  var flows=step?(step.flows||[]):[];
+  if(ibC) ibC.className='ib'+(S.hC?'':' off')+(flows.indexOf('code_a3')>=0?' hl':'');
+  if(ibI) ibI.className='ib'+(S.hI?'':' off')+(flows.indexOf('img_a4')>=0?' hl':'');
+}
+
+function rDetail(idx){
+  var p=document.getElementById('detP');
+  if(idx<0||!STEPS[idx]){p.innerHTML='<div class="dp-empty">Click Start to step through the data pipeline</div>';return;}
+  var s=STEPS[idx];
+  var bgc={'M':'var(--color-background-info)','A1':'var(--color-background-info)','A2':'var(--color-background-success)',
+           'A3':'var(--color-background-warning)','A4':'var(--color-background-warning)',
+           'OUT':'var(--color-background-danger)','idle':'var(--color-background-secondary)'};
+  var tc={'M':'var(--color-text-info)','A1':'var(--color-text-info)','A2':'var(--color-text-success)',
+          'A3':'var(--color-text-warning)','A4':'var(--color-text-warning)',
+          'OUT':'var(--color-text-danger)','idle':'var(--color-text-tertiary)'};
+  var ph=s.ph||'idle';
+  p.innerHTML='<div class="dp-step" style="background:'+bgc[ph]+';color:'+tc[ph]+'">Step '+(idx+1)+' / '+STEPS.length+'</div>'+
+    '<div class="dp-title">'+s.t+'</div>'+
+    '<div class="dp-detail">'+s.x.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')+'</div>';
+}
+
+function apply(idx){
+  S.idx=idx;
+  var step=idx>=0?STEPS[idx]:null;
+  rArrows(step?(step.flows||[]):[]);
+  rCards(idx);
+  rDetail(idx);
+  uBtns();
+}
+
+function uBtns(){
+  document.getElementById('bPrev').disabled=S.idx<0;
+  document.getElementById('bNext').disabled=S.idx>=STEPS.length-1;
+  var pct=STEPS.length>0?Math.max(0,S.idx+1)/STEPS.length*100:0;
+  document.getElementById('pFill').style.width=pct+'%';
+  document.getElementById('pTxt').textContent=Math.max(0,S.idx+1)+' / '+STEPS.length;
+  var bp=document.getElementById('bPlay');
+  if(S.idx<0){bp.textContent='▶ Start';bp.className='btn btn-p';}
+  else if(S.idx>=STEPS.length-1){bp.textContent='↺ Replay';bp.className='btn';}
+  else if(S.play){bp.textContent='⏸ Pause';bp.className='btn';}
+  else{bp.textContent='▶ Continue';bp.className='btn btn-p';}
+}
+
+function tP(){
+  if(S.idx>=STEPS.length-1){reset();setTimeout(go,60);return;}
+  if(S.idx<0){go();return;}
+  if(S.play){S.play=false;clearTimeout(S.tmr);uBtns();}else go();
+}
+function go(){S.play=true;uBtns();tick();}
+function tick(){if(!S.play)return;if(S.idx>=STEPS.length-1){S.play=false;uBtns();return;}apply(S.idx+1);S.tmr=setTimeout(tick,2100);}
+function sP(){S.play=false;clearTimeout(S.tmr);apply(Math.max(-1,S.idx-1));}
+function sN(){S.play=false;clearTimeout(S.tmr);if(S.idx<STEPS.length-1)apply(S.idx+1);}
+function reset(){S.play=false;clearTimeout(S.tmr);apply(-1);}
+function setD(d){S.dom=d;document.getElementById('sgCOD').className='seg'+(d==='COD'?' on':'');document.getElementById('sgSOD').className='seg'+(d==='SOD'?' on':'');reinit();}
+function tgC(){S.hC=!S.hC;var on=S.hC;document.getElementById('ttC').style.background=on?'#185fa5':'var(--color-border-tertiary)';document.getElementById('thC').style.left=on?'14px':'2px';document.getElementById('tlC').style.color=on?'var(--color-text-info)':'var(--color-text-tertiary)';reinit();}
+function tgI(){S.hI=!S.hI;var on=S.hI;document.getElementById('ttI').style.background=on?'#854f0b':'var(--color-border-tertiary)';document.getElementById('thI').style.left=on?'14px':'2px';document.getElementById('tlI').style.color=on?'var(--color-text-warning)':'var(--color-text-tertiary)';reinit();}
+function reinit(){S.play=false;clearTimeout(S.tmr);S.idx=-1;init();}
+init();
+</script>
+</body>
+</html>

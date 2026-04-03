@@ -1,0 +1,242 @@
+[
+  {
+    "title": "CamoDiffusion",
+    "arxiv_id": "",
+    "year": 2025,
+    "venue": "IEEE TPAMI",
+    "ccf_rank": "A",
+    "sci_tier": "Q1",
+    "paper_url": "",
+    "code_url": "",
+    "scores": {
+      "CAMO": {"Sm": 0.879, "Em": 0.94, "Fm": 0.854, "MAE": 0.042},
+      "COD10K": {"Sm": 0.88, "Em": 0.943, "Fm": 0.815, "MAE": 0.02},
+      "NC4K": {"Sm": 0.892, "Em": 0.941, "Fm": 0.858, "MAE": 0.029}
+    }
+  },
+  {
+    "title": "CFRN",
+    "arxiv_id": "",
+    "year": 2025,
+    "venue": "IEEE TIP",
+    "ccf_rank": "A",
+    "sci_tier": "Q1",
+    "paper_url": "",
+    "code_url": "",
+    "scores": {
+      "CAMO": {"Sm": 0.881, "Em": 0.941, "Fm": 0.849, "MAE": 0.039},
+      "COD10K": {"Sm": 0.872, "Em": 0.942, "Fm": 0.8, "MAE": 0.021},
+      "NC4K": {"Sm": 0.891, "Em": 0.855, "Fm": 0.945, "MAE": 0.029}
+    }
+  },
+  {
+    "title": "ESCNet",
+    "arxiv_id": "",
+    "year": 2025,
+    "venue": "ICCV",
+    "ccf_rank": "A",
+    "sci_tier": "Q1",
+    "paper_url": "",
+    "code_url": "",
+    "scores": {
+      "CAMO": {"Sm": 0.871, "Em": 0.934, "Fm": 0.843, "MAE": 0.044},
+      "COD10K": {"Sm": 0.873, "Em": 0.939, "Fm": 0.804, "MAE": 0.021},
+      "NC4K": {"Sm": 0.892, "Em": 0.941, "Fm": 0.859, "MAE": 0.028}
+    }
+  },
+  {
+    "title": "BDCL-Net",
+    "arxiv_id": "",
+    "year": 2025,
+    "venue": "Knowledge-Based Systems",
+    "ccf_rank": "B",
+    "sci_tier": "Q2",
+    "paper_url": "",
+    "code_url": "",
+    "scores": {
+      "CAMO": {"Sm": 0.881, "Em": 0.929, "Fm": 0.845, "MAE": 0.039},
+      "COD10K": {"Sm": 0.869, "Em": 0.935, "Fm": 0.79, "MAE": 0.022},
+      "NC4K": {"Sm": 0.888, "Em": 0.932, "Fm": 0.844, "MAE": 0.032}
+    }
+  },
+  {
+    "title": "PRBE",
+    "arxiv_id": "",
+    "year": 2025,
+    "venue": "IEEE TMM",
+    "ccf_rank": "B",
+    "sci_tier": "Q2",
+    "paper_url": "",
+    "code_url": "",
+    "scores": {
+      "CAMO": {"Sm": 0.876, "Em": 0.928, "Fm": 0.837, "MAE": 0.045},
+      "COD10K": {"Sm": 0.867, "Em": 0.932, "Fm": 0.793, "MAE": 0.021},
+      "NC4K": {"Sm": 0.887, "Em": 0.931, "Fm": 0.845, "MAE": 0.031}
+    }
+  },
+  {
+    "title": "CamoFormer-P",
+    "arxiv_id": "",
+    "year": 2024,
+    "venue": "IEEE TPAMI",
+    "ccf_rank": "A",
+    "sci_tier": "Q1",
+    "paper_url": "",
+    "code_url": "",
+    "scores": {
+      "CAMO": {"Sm": 0.876, "Em": 0.935, "Fm": 0.832, "MAE": 0.043},
+      "COD10K": {"Sm": 0.862, "Em": 0.932, "Fm": 0.772, "MAE": 0.024},
+      "NC4K": {"Sm": 0.888, "Em": 0.941, "Fm": 0.84, "MAE": 0.031}
+    }
+  },
+  {
+    "title": "MSCAF-Net",
+    "arxiv_id": "",
+    "year": 2023,
+    "venue": "IEEE TCSVT",
+    "ccf_rank": "B",
+    "sci_tier": "Q2",
+    "paper_url": "",
+    "code_url": "",
+    "scores": {
+      "CAMO": {"Sm": 0.873, "Em": 0.929, "Fm": 0.828, "MAE": 0.046},
+      "COD10K": {"Sm": 0.865, "Em": 0.927, "Fm": 0.775, "MAE": 0.024},
+      "NC4K": {"Sm": 0.887, "Em": 0.935, "Fm": 0.839, "MAE": 0.032}
+    }
+  },
+  {
+    "title": "UEDG",
+    "arxiv_id": "",
+    "year": 2024,
+    "venue": "IEEE TMM",
+    "ccf_rank": "B",
+    "sci_tier": "Q2",
+    "paper_url": "",
+    "code_url": "",
+    "scores": {
+      "CAMO": {"Sm": 0.868, "Em": 0.922, "Fm": 0.819, "MAE": 0.048},
+      "COD10K": {"Sm": 0.858, "Em": 0.924, "Fm": 0.766, "MAE": 0.025},
+      "NC4K": {"Sm": 0.881, "Em": 0.928, "Fm": 0.829, "MAE": 0.035}
+    }
+  },
+  {
+    "title": "FSPNet",
+    "arxiv_id": "",
+    "year": 2023,
+    "venue": "CVPR",
+    "ccf_rank": "A",
+    "sci_tier": "Q1",
+    "paper_url": "",
+    "code_url": "",
+    "scores": {
+      "CAMO": {"Sm": 0.856, "Em": 0.899, "Fm": 0.799, "MAE": 0.05},
+      "COD10K": {"Sm": 0.851, "Em": 0.895, "Fm": 0.735, "MAE": 0.026},
+      "NC4K": {"Sm": 0.879, "Em": 0.915, "Fm": 0.816, "MAE": 0.035}
+    }
+  },
+  {
+    "title": "ZoomNet",
+    "arxiv_id": "",
+    "year": 2022,
+    "venue": "CVPR",
+    "ccf_rank": "A",
+    "sci_tier": "Q1",
+    "paper_url": "",
+    "code_url": "",
+    "scores": {
+      "CAMO": {"Sm": 0.82, "Em": 0.877, "Fm": 0.792, "MAE": 0.066},
+      "COD10K": {"Sm": 0.838, "Em": 0.888, "Fm": 0.74, "MAE": 0.029},
+      "NC4K": {"Sm": 0.853, "Em": 0.896, "Fm": 0.814, "MAE": 0.043}
+    }
+  },
+  {
+    "title": "FEDER",
+    "arxiv_id": "",
+    "year": 2023,
+    "venue": "CVPR",
+    "ccf_rank": "A",
+    "sci_tier": "Q1",
+    "paper_url": "",
+    "code_url": "",
+    "scores": {
+      "CAMO": {"Sm": 0.807, "Em": 0.873, "Fm": 0.738, "MAE": 0.069},
+      "COD10K": {"Sm": 0.823, "Em": 0.9, "Fm": 0.716, "MAE": 0.032},
+      "NC4K": {"Sm": 0.846, "Em": 0.905, "Fm": 0.789, "MAE": 0.045}
+    }
+  },
+  {
+    "title": "SINetV2",
+    "arxiv_id": "",
+    "year": 2022,
+    "venue": "IEEE TPAMI",
+    "ccf_rank": "A",
+    "sci_tier": "Q1",
+    "paper_url": "",
+    "code_url": "",
+    "scores": {
+      "CAMO": {"Sm": 0.822, "Em": 0.882, "Fm": 0.779, "MAE": 0.07},
+      "COD10K": {"Sm": 0.815, "Em": 0.887, "Fm": 0.682, "MAE": 0.037},
+      "NC4K": {"Sm": 0.847, "Em": 0.903, "Fm": 0.792, "MAE": 0.048}
+    }
+  },
+  {
+    "title": "diffCOD",
+    "arxiv_id": "",
+    "year": 2023,
+    "venue": "arXiv",
+    "ccf_rank": "-",
+    "sci_tier": "N/A",
+    "paper_url": "",
+    "code_url": "",
+    "scores": {
+      "CAMO": {"Sm": 0.795, "Em": 0.852, "Fm": 0.704, "MAE": 0.082},
+      "COD10K": {"Sm": 0.812, "Em": 0.892, "Fm": 0.684, "MAE": 0.036},
+      "NC4K": {"Sm": 0.837, "Em": 0.891, "Fm": 0.761, "MAE": 0.051}
+    }
+  },
+  {
+    "title": "PFNet",
+    "arxiv_id": "",
+    "year": 2021,
+    "venue": "CVPR",
+    "ccf_rank": "A",
+    "sci_tier": "Q1",
+    "paper_url": "",
+    "code_url": "",
+    "scores": {
+      "CAMO": {"Sm": 0.782, "Em": 0.841, "Fm": 0.751, "MAE": 0.085},
+      "COD10K": {"Sm": 0.8, "Em": 0.877, "Fm": 0.676, "MAE": 0.04},
+      "NC4K": {"Sm": 0.829, "Em": 0.887, "Fm": 0.779, "MAE": 0.053}
+    }
+  },
+  {
+    "title": "UGTR",
+    "arxiv_id": "",
+    "year": 2021,
+    "venue": "ICCV",
+    "ccf_rank": "A",
+    "sci_tier": "Q1",
+    "paper_url": "",
+    "code_url": "",
+    "scores": {
+      "CAMO": {"Sm": 0.784, "Em": 0.821, "Fm": 0.747, "MAE": 0.086},
+      "COD10K": {"Sm": 0.817, "Em": 0.852, "Fm": 0.67, "MAE": 0.036},
+      "NC4K": {"Sm": 0.839, "Em": 0.874, "Fm": 0.778, "MAE": 0.052}
+    }
+  },
+  {
+    "title": "SINet",
+    "arxiv_id": "",
+    "year": 2020,
+    "venue": "CVPR",
+    "ccf_rank": "A",
+    "sci_tier": "Q1",
+    "paper_url": "",
+    "code_url": "",
+    "scores": {
+      "CAMO": {"Sm": 0.745, "Em": 0.804, "Fm": 0.712, "MAE": 0.092},
+      "COD10K": {"Sm": 0.776, "Em": 0.864, "Fm": 0.667, "MAE": 0.043},
+      "NC4K": {"Sm": 0.808, "Em": 0.871, "Fm": 0.768, "MAE": 0.058}
+    }
+  }
+]

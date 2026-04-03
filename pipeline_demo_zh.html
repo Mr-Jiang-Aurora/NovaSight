@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOD/COD 多 Agent 科研助手 — 数据流演示（中文版）</title>
+<style>
+/* ── CSS 变量（脱离 Claude 界面独立运行）──────────────────────── */
+:root {
+  --color-background-primary:   #ffffff;
+  --color-background-secondary: #f8f7f4;
+  --color-background-tertiary:  #f1efe8;
+  --color-background-info:      #e6f1fb;
+  --color-background-success:   #eaf3de;
+  --color-background-warning:   #faeeda;
+  --color-background-danger:    #fcebeb;
+  --color-text-primary:         #1a1a18;
+  --color-text-secondary:       #5f5e5a;
+  --color-text-tertiary:        #888780;
+  --color-text-info:            #185fa5;
+  --color-text-success:         #3b6d11;
+  --color-text-warning:         #854f0b;
+  --color-text-danger:          #a32d2d;
+  --color-border-tertiary:      rgba(0,0,0,0.12);
+  --color-border-secondary:     rgba(0,0,0,0.22);
+  --color-border-info:          #378add;
+  --color-border-success:       #639922;
+  --color-border-warning:       #ba7517;
+  --color-border-danger:        #e24b4a;
+  --font-sans:  -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  --font-mono:  "Menlo", "Consolas", "Courier New", monospace;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background-primary:   #1e1d1b;
+    --color-background-secondary: #27261f;
+    --color-background-tertiary:  #1a1916;
+    --color-background-info:      #042c53;
+    --color-background-success:   #173404;
+    --color-background-warning:   #412402;
+    --color-background-danger:    #501313;
+    --color-text-primary:         #e8e6df;
+    --color-text-secondary:       #b4b2a9;
+    --color-text-tertiary:        #888780;
+    --color-text-info:            #85b7eb;
+    --color-text-success:         #97c459;
+    --color-text-warning:         #ef9f27;
+    --color-text-danger:          #f09595;
+    --color-border-tertiary:      rgba(255,255,255,0.12);
+    --color-border-secondary:     rgba(255,255,255,0.22);
+    --color-border-info:          #185fa5;
+    --color-border-success:       #3b6d11;
+    --color-border-warning:       #854f0b;
+    --color-border-danger:        #a32d2d;
+  }
+}
+
+/* ── 页面基础 ──────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body {
+  margin: 0;
+  padding: 28px 20px 40px;
+  background: var(--color-background-tertiary);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+}
+#wrap { max-width: 920px; margin: 0 auto; }
+
+/* ── 页面标题区 ────────────────────────────────────────────────── */
+.page-head { text-align: center; margin-bottom: 20px; }
+.page-head h1 { font-size: 18px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.01em; }
+.page-head p  { font-size: 12px; color: var(--color-text-tertiary); margin-top: 4px; }
+
+/* ── Widget 样式 ───────────────────────────────────────────────── */
+*{box-sizing:border-box}
+#app{background:var(--color-background-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;font-family:var(--font-sans);border:0.5px solid var(--color-border-tertiary);box-shadow:0 2px 12px rgba(0,0,0,0.07)}
+.hdr{padding:10px 16px;background:var(--color-background-secondary);border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.hdr-title{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.hdr-badge{font-size:10px;padding:2px 8px;border:0.5px solid var(--color-border-tertiary);border-radius:20px;color:var(--color-text-tertiary)}
+.btns{display:flex;gap:5px;margin-left:auto}
+.btn{font-size:12px;padding:4px 11px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer;font-family:var(--font-sans);transition:background 0.12s}
+.btn:hover:not(:disabled){background:var(--color-background-secondary)}
+.btn:disabled{opacity:0.3;cursor:default}
+.btn-p{background:var(--color-background-info);border-color:var(--color-border-info);color:var(--color-text-info)}
+.cfg{padding:7px 16px;background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.segs{display:flex}
+.seg{font-size:11px;padding:3px 9px;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-secondary);cursor:pointer;font-family:var(--font-sans)}
+.seg:first-child{border-radius:var(--border-radius-md) 0 0 var(--border-radius-md)}
+.seg:last-child{border-radius:0 var(--border-radius-md) var(--border-radius-md) 0}
+.seg.on{background:var(--color-background-info);color:var(--color-text-info);border-color:var(--color-border-info)}
+.tw{display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+.tt{width:28px;height:16px;border-radius:8px;position:relative;transition:background 0.2s;flex-shrink:0}
+.th{position:absolute;top:2px;left:2px;width:12px;height:12px;background:#fff;border-radius:50%;transition:left 0.2s;pointer-events:none}
+.tl{font-size:11px;color:var(--color-text-tertiary)}
+.pw{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.pt{font-size:10px;color:var(--color-text-tertiary)}
+.pb{width:80px;height:2px;background:var(--color-border-tertiary);border-radius:1px;overflow:hidden}
+.pf{height:100%;background:var(--color-border-info);border-radius:1px;transition:width 0.3s}
+.cvw{overflow-x:auto;padding:14px 14px 6px}
+.cv{position:relative;width:840px;height:490px;margin:0 auto}
+.ac{position:absolute;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);background:var(--color-background-primary);padding:8px 10px;transition:border-color 0.22s,background 0.22s;overflow:hidden}
+.ac.skipped{opacity:0.2}
+.act{display:flex;align-items:center;gap:6px;margin-bottom:3px}
+.atag{font-size:9px;font-weight:500;letter-spacing:0.05em;padding:2px 5px;border-radius:4px;flex-shrink:0}
+.aname{font-size:12px;font-weight:500;color:var(--color-text-primary);line-height:1}
+.ast{margin-left:auto;display:flex;align-items:center;gap:3px;font-size:9px;padding:2px 5px;border-radius:20px;background:var(--color-background-secondary);color:var(--color-text-tertiary);white-space:nowrap}
+.adot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.asub{font-size:9px;color:var(--color-text-tertiary);margin-bottom:4px}
+.aitems{font-size:9px;color:var(--color-text-tertiary);line-height:1.45}
+.ib{position:absolute;border:0.5px dashed var(--color-border-secondary);border-radius:var(--border-radius-md);padding:5px 8px;background:var(--color-background-secondary);transition:opacity 0.22s,border-color 0.22s}
+.ib.off{opacity:0.18}
+.ib.hl{border-style:solid;border-color:var(--color-border-info)}
+.ibn{font-size:10px;font-weight:500;color:var(--color-text-secondary);margin-bottom:1px}
+.ibs{font-size:9px;color:var(--color-text-tertiary)}
+.ob{position:absolute;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:8px 14px;background:var(--color-background-primary);display:flex;align-items:center;gap:10px;transition:border-color 0.22s}
+.ob.lit{border-color:var(--color-border-danger)}
+.on2{font-size:11px;font-weight:500;color:var(--color-text-secondary)}
+.os{font-size:9px;color:var(--color-text-tertiary)}
+.ocheck{margin-left:auto;font-size:11px;color:var(--color-text-success);font-weight:500;display:none}
+@keyframes scan{0%{left:-60%}100%{left:120%}}
+@keyframes dp{0%,100%{opacity:1}50%{opacity:0.15}}
+.scan{position:absolute;top:0;bottom:0;left:-60%;width:55%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.05),transparent);animation:scan 1.5s linear infinite;pointer-events:none}
+.dp{padding:12px 16px 14px;background:var(--color-background-primary);border-top:0.5px solid var(--color-border-tertiary);min-height:130px}
+.dp-step{font-size:9px;font-weight:500;padding:1px 6px;border-radius:4px;display:inline-block;margin-bottom:5px}
+.dp-title{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px}
+.dp-detail{font-size:11px;font-family:var(--font-mono);color:var(--color-text-secondary);line-height:1.65;background:var(--color-background-secondary);padding:8px 10px;border-radius:var(--border-radius-md);white-space:pre-wrap;word-break:break-word}
+.dp-empty{font-size:12px;color:var(--color-text-tertiary);text-align:center;padding:40px 0}
+</style>
+</head>
+<body>
+<div id="wrap">
+
+  <!-- 页面标题 -->
+  <div class="page-head">
+    <h1>SOD / COD 多 Agent 科研助手 — 数据流演示</h1>
+    <p>一主四专 Agent 架构 · 自动化学术调研 · 点击「开始」逐步演示完整数据流</p>
+  </div>
+
+  <!-- Widget 主体 -->
+  <div id="app">
+    <div class="hdr">
+      <span class="hdr-title">SOD / COD 多 Agent 科研助手系统</span>
+      <span class="hdr-badge">主控 + 4 个专业 Agent</span>
+      <div class="btns">
+        <button class="btn" id="bPrev" onclick="sP()" disabled>&#9664;</button>
+        <button class="btn btn-p" id="bPlay" onclick="tP()">&#9654; 开始</button>
+        <button class="btn" id="bNext" onclick="sN()">&#9654;</button>
+        <button class="btn" onclick="reset()">&#8635;</button>
+      </div>
+    </div>
+    <div class="cfg">
+      <span style="font-size:11px;color:var(--color-text-tertiary)">研究领域</span>
+      <div class="segs">
+        <div class="seg on" id="sgCOD" onclick="setD('COD')">COD</div>
+        <div class="seg" id="sgSOD" onclick="setD('SOD')">SOD</div>
+      </div>
+      <div style="width:0.5px;height:14px;background:var(--color-border-tertiary)"></div>
+      <label class="tw" onclick="tgC()">
+        <div class="tt" id="ttC" style="background:#185fa5"><div class="th" id="thC" style="left:14px"></div></div>
+        <span class="tl" id="tlC" style="color:var(--color-text-info)">代码输入</span>
+      </label>
+      <label class="tw" onclick="tgI()">
+        <div class="tt" id="ttI" style="background:var(--color-border-tertiary)"><div class="th" id="thI" style="left:2px"></div></div>
+        <span class="tl" id="tlI">图像输入</span>
+      </label>
+      <div class="pw">
+        <span class="pt" id="pTxt">0 / 0</span>
+        <div class="pb"><div class="pf" id="pFill" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <!-- 画布区 -->
+    <div class="cvw">
+    <div class="cv" id="cv">
+    <svg id="svgL" width="840" height="490" style="position:absolute;top:0;left:0;pointer-events:none;overflow:visible">
+    <defs><marker id="mh" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+    </svg>
+
+    <!-- 主控 -->
+    <div class="ac" id="acM" style="left:182px;top:8px;width:476px;height:58px">
+      <div class="scan" id="scM" style="display:none"></div>
+      <div class="act">
+        <div class="atag" style="background:var(--color-background-info);color:var(--color-text-info)">主控</div>
+        <div class="aname">Master Control Agent</div>
+        <div class="ast" id="stM"><div class="adot" id="dtM" style="background:var(--color-border-tertiary)"></div><span id="slM">空闲</span></div>
+      </div>
+      <div class="aitems">工作流规划 &middot; SharedContext 管理 &middot; 分段综合（6 节 &times; 8 000 tokens）</div>
+    </div>
+
+    <!-- 图像输入 -->
+    <div class="ib off" id="ibI" style="left:620px;top:72px;width:182px">
+      <div class="ibn">图像输入</div>
+      <div class="ibs">架构图 / 对比图</div>
+    </div>
+
+    <!-- A1 -->
+    <div class="ac" id="acA1" style="left:14px;top:148px;width:175px;height:116px">
+      <div class="scan" id="scA1" style="display:none"></div>
+      <div class="act">
+        <div class="atag" style="background:var(--color-background-info);color:var(--color-text-info)">A1</div>
+        <div class="aname">SOTA 检索</div>
+        <div class="ast" id="stA1"><div class="adot" id="dtA1" style="background:var(--color-border-tertiary)"></div><span id="slA1">空闲</span></div>
+      </div>
+      <div class="asub">4 源并行检索</div>
+      <div class="aitems">Semantic Scholar<br>DBLP &middot; CVF &middot; OpenAlex<br>PDF 获取 &middot; 表格解析<br>论文信息卡片（CCF/IF）</div>
+    </div>
+
+    <!-- A2 -->
+    <div class="ac" id="acA2" style="left:248px;top:148px;width:175px;height:116px">
+      <div class="scan" id="scA2" style="display:none"></div>
+      <div class="act">
+        <div class="atag" style="background:var(--color-background-success);color:var(--color-text-success)">A2</div>
+        <div class="aname">指标诊断</div>
+        <div class="ast" id="stA2"><div class="adot" id="dtA2" style="background:var(--color-border-tertiary)"></div><span id="slA2">空闲</span></div>
+      </div>
+      <div class="asub">12 维度排名分析</div>
+      <div class="aitems">3 数据集 &times; 4 指标<br>饱和度分析<br>深度报告 6 节<br>质量检查 + 自动重试</div>
+    </div>
+
+    <!-- A4 -->
+    <div class="ac" id="acA4" style="left:620px;top:148px;width:182px;height:116px">
+      <div class="scan" id="scA4" style="display:none"></div>
+      <div class="act">
+        <div class="atag" style="background:var(--color-background-warning);color:var(--color-text-warning)">A4</div>
+        <div class="aname">视觉分析</div>
+        <div class="ast" id="stA4"><div class="adot" id="dtA4" style="background:var(--color-border-tertiary)"></div><span id="slA4">空闲</span></div>
+      </div>
+      <div class="asub">6 维度架构解析</div>
+      <div class="aitems">图像溯源（FigureTracer）<br>创新性评估<br>structure_hint &rarr; A3<br>Claude Vision 8k tokens</div>
+    </div>
+
+    <!-- 代码输入 -->
+    <div class="ib off" id="ibC" style="left:14px;top:350px;width:175px">
+      <div class="ibn">代码输入</div>
+      <div class="ibs">GitHub URL / 本地文件上传</div>
+    </div>
+
+    <!-- A3 -->
+    <div class="ac" id="acA3" style="left:248px;top:300px;width:175px;height:134px">
+      <div class="scan" id="scA3" style="display:none"></div>
+      <div class="act">
+        <div class="atag" style="background:var(--color-background-warning);color:var(--color-text-warning)">A3</div>
+        <div class="aname">代码分析</div>
+        <div class="ast" id="stA3"><div class="adot" id="dtA3" style="background:var(--color-border-tertiary)"></div><span id="slA3">空闲</span></div>
+      </div>
+      <div class="asub">5000 行代码上下文</div>
+      <div class="aitems">AST 静态分析<br>Claude 语义分析（6 规则）<br>架构 &harr; 代码验证<br>&ge;8 条改进建议（含估算）</div>
+    </div>
+
+    <!-- 最终输出 -->
+    <div class="ob" id="outB" style="left:182px;top:452px;width:476px">
+      <div>
+        <div class="on2">最终报告</div>
+        <div class="os">master_report.md &middot; 6 节 &middot; 23 000+ 字符 &middot; 结构化 JSON</div>
+      </div>
+      <div class="ocheck" id="outOK">完成 ✓</div>
+    </div>
+
+    </div><!-- .cv -->
+    </div><!-- .cvw -->
+
+    <!-- 详情面板 -->
+    <div class="dp" id="detP"><div class="dp-empty">点击「开始」逐步演示数据流程</div></div>
+  </div><!-- #app -->
+
+</div><!-- #wrap -->
+
+<script>
+var S={hC:true,hI:false,dom:'COD',idx:-1,play:false,tmr:null};
+var COL={M:'#185fa5',A1:'#185fa5',A2:'#3b6d11',A3:'#854f0b',A4:'#854f0b'};
+var BG={M:'rgba(24,95,165,0.05)',A1:'rgba(24,95,165,0.05)',A2:'rgba(99,153,34,0.05)',A3:'rgba(186,117,23,0.05)',A4:'rgba(186,117,23,0.05)'};
+var STEPS=[];
+
+function bSteps(hc,hi){
+  var d=S.dom,ss=[];
+  ss.push({ph:'idle',active:[],flows:[],
+    t:'系统就绪 — 等待用户输入',
+    x:'研究领域：'+d+
+      '\n代码输入：'+(hc?'GitHub URL / 本地上传  [已启用]':'[未启用 — Agent 3 将被跳过]')+
+      '\n图像输入：'+(hi?'架构图 / 对比图  [已启用]':'[未启用 — Agent 4 将被跳过]')+
+      '\n\n主控 Agent 将规划工作流并调度各专业 Agent。'});
+
+  ss.push({ph:'M',active:['M'],flows:['md'],
+    t:'主控 Agent — 工作流规划',
+    x:'WorkflowPlanner.plan()：\n  A1 SOTA 检索      始终运行\n  A2 指标诊断       始终运行\n'+
+      '  A3 代码分析       '+(hc?'已启用（检测到代码输入）':'已跳过（无代码输入）')+'\n'+
+      '  A4 视觉分析       '+(hi?'已启用（检测到图像输入）':'已跳过（无图像输入）')+'\n\n'+
+      'SharedContext 已初始化  session_id='+d.toLowerCase()+'_'+new Date().toISOString().slice(0,10)});
+
+  ss.push({ph:'A1',active:['M','A1'],flows:['m_a1'],
+    t:'Agent 1 — 多源并行文献检索',
+    x:'SearchOrchestrator（4 路并发检索）：\n'+
+      '  Semantic Scholar   全文 + 引用图谱 + 开放 PDF\n'+
+      '  DBLP               会议 / 期刊结构化书目\n'+
+      '  CVF                CVPR / ICCV 开放索引\n'+
+      '  OpenAlex           开放元数据 + 引用数\n\n'+
+      '过滤条件：年份 >= 2024   级别：CCF-A / SCI Q1\n'+
+      '结果：约 313 篇原始论文  →  68 篇（去重 + 过滤后）'});
+
+  ss.push({ph:'A1',active:['A1'],flows:[],
+    t:'Agent 1 — PDF 获取与表格提取',
+    x:'第 2 阶段  PDF 获取（5 级瀑布流）：\n'+
+      '  ar5iv → Unpaywall → CORE API → Sci-Hub 备用 → 跳过\n'+
+      '  成功率：51.5%（35 / 68 篇）\n\n'+
+      '第 3 阶段  表格提取（4 级流水线）：\n'+
+      '  A  ar5iv HTML 解析          （最快，约 75% 覆盖率）\n'+
+      '  B  PyMuPDF 规则匹配         （标准边框表格）\n'+
+      '  C  Docling 深度解析         （booktabs，97.9% 准确率）\n'+
+      '  D  Claude VLM 兜底          （旋转 / 图像内嵌表格）\n\n'+
+      '人工补充：16 篇（Excel 导入）→ 25 篇含指标论文'});
+
+  ss.push({ph:'A1',active:['A1'],flows:[],
+    t:'Agent 1 — 论文信息卡片生成（TASK 4）',
+    x:'PaperCardWriter  →  paper_cards_'+d+'.md\n\n'+
+      '分组方式：CCF-A | CCF-B | SCI Q1 | 其他\n\n'+
+      '每篇论文字段：\n'+
+      '  标题、期刊 / 会议（全称）、年份、CCF 等级、中科院分区\n'+
+      '  影响因子（2023 年）、摘要节选\n\n'+
+      '链接类型：\n'+
+      '  开放 PDF   arXiv   Semantic Scholar   代码仓库\n'+
+      '  付费链接已标注（IEEE Xplore / Elsevier / Springer）'});
+
+  ss.push({ph:'A1',active:['A1'],flows:['a1_a2'],
+    t:'Agent 1 完成 — SOTALeaderboard 传递给 Agent 2',
+    x:'传递：SOTALeaderboard（'+d+'，68 篇，25 篇含指标）→ SharedContext\n\n'+
+      '输出已保存至 cache/agent1/'+new Date().toISOString().slice(0,10)+'/ ：\n'+
+      '  fetch_result_'+d+'_*.json\n'+
+      '  paper_cards_'+d+'_*.md\n'+
+      '  failed_extraction_*.md'});
+
+  ss.push({ph:'A2',active:['A2'],flows:['a1_a2'],
+    t:'Agent 2 — 排行榜构建与差距分析',
+    x:'Ranker.compute_all_rankings()：\n'+
+      '  3 个数据集（COD10K / CAMO / NC4K）× 4 指标（Sm / Em / Fm / MAE）\n'+
+      '  = 12 个独立排行榜\n\n'+
+      'GapAnalyzer：\n'+
+      '  yearly_sota        每指标每年最优值（2020–2025）\n'+
+      '  yearly_delta       逐年提升幅度\n'+
+      '  saturation         饱和 / 活跃 / 快速（按指标分类）\n'+
+      '  current_range      所有方法的最大 − 最小差值\n\n'+
+      'Profiler：每个方法在各指标上的排名百分位'});
+
+  ss.push({ph:'A2',active:['A2'],flows:[],
+    t:'Agent 2 — 深度叙述报告（6 节 × 8 000 tokens）',
+    x:'NarrativeGenerator — 6 轮独立 Claude 调用：\n'+
+      '  第 1 节  SOTA 精确基线         指标表 + 逐年进展\n'+
+      '  第 2 节  Top-N 方法对比        跨数据集 + 架构推理\n'+
+      '  第 3 节  指标饱和度分析         差距值 + 饱和度表格\n'+
+      '  第 4 节  研究机会识别           技术路径，2–4 个方向\n'+
+      '  第 5 节  改进路线图             3–6 条具体建议（含代码提示）\n'+
+      '  第 6 节  行动清单               2 周任务 + 里程碑规划\n\n'+
+      '约束条件：每个结论均有数字支撑  无冗余措辞\n'+
+      '          质量检查不通过则自动重试'});
+
+  var a2f=hc?['a2_a3']:[];
+  ss.push({ph:'A2',active:['A2'],flows:a2f,
+    t:'Agent 2 完成 — 摘要传递至下游',
+    x:'agent2_summary.txt → SharedContext.agent2_summary\n'+
+      (hc?'  → 转发给 Agent 3 作为 SOTA 背景分析依据\n':'')+
+      '\n输出已保存至 cache/agent2/'+new Date().toISOString().slice(0,10)+'/ ：\n'+
+      '  agent2_report_'+d+'_*.md\n'+
+      '  agent2_report_'+d+'_*.json\n'+
+      '  agent2_summary_'+d+'_*.txt'});
+
+  if(hi){
+    ss.push({ph:'A4',active:['A4'],flows:['img_a4'],
+      t:'Agent 4 — 架构图深度解析（6 维度）',
+      x:'ArchAnalyzer（Claude Vision，max_tokens=8 000）：\n\n'+
+        '  维度 1  模块功能 + 设计动机（每项 >20 字符）\n'+
+        '  维度 2  数据流：训练路径 vs 推理路径（分别描述）\n'+
+        '  维度 3  架构对比：vs U-Net  vs Transformer-seg\n'+
+        '  维度 4  代码映射：文件路径、类名、关键方法\n'+
+        '  维度 5  基于架构的局限性分析\n'+
+        '  维度 6  structure_hint >150 字符，供 Agent 3 下游使用\n\n'+
+        '质量检查：6 项标准 — 不通过最多重试 2 次'});
+
+    ss.push({ph:'A4',active:['A4'],flows:[],
+      t:'Agent 4 — 论文图溯源（TASK 1：FigureTracer）',
+      x:'FigureTracer  →  Semantic Scholar 搜索 API（4 路并发查询）：\n\n'+
+        '  查询 1  模块缩写，如 "ATCN LE camouflaged object detection"\n'+
+        '  查询 2  骨干网络名称 + 任务关键词\n'+
+        '  查询 3  从数据流文本中提取的大写缩写\n'+
+        '  查询 4  兜底：通用领域查询\n\n'+
+        '排名算法：标题关键词重叠 + log(引用数) + 时效加分\n\n'+
+        '输出：figure_trace.md\n'+
+        '  最佳匹配标题、作者、年份、期刊/会议、引用数\n'+
+        '  PDF / arXiv / Semantic Scholar 链接、置信度评级'});
+
+    ss.push({ph:'A4',active:['A4'],flows:[],
+      t:'Agent 4 — 学术创新性评估（TASK 3：5 维度）',
+      x:'InnovationEvaluator（Claude Vision + SOTA 背景，8 000 tokens）：\n\n'+
+        '  维度 1  创新等级：范式级 / 架构级 / 增量级 / 工程级\n'+
+        '  维度 2  核心贡献：一句话，最多 50 字\n'+
+        '  维度 3  与前人工作的区别（COD 领域首次出现的组件）\n'+
+        '  维度 4  审稿人可能提出的质疑\n'+
+        '  维度 5  开启的未来研究方向\n\n'+
+        '输出：innovation_evaluation.md（>600 字符）'});
+
+    var a4f=hc?['a4_a3']:['a4_ret'];
+    ss.push({ph:'A4',active:['A4'],flows:a4f,
+      t:'Agent 4 完成 — structure_hint 传递至下游',
+      x:'structure_hint（>150 字符）→ SharedContext.structure_hint\n'+
+        (hc?'  → 转发给 Agent 3：指导文件选择 + Claude 提示词\n':
+            '  → 转发给主控进行综合分析\n')+
+        '\n输出已保存至 cache/agent4/'+new Date().toISOString().slice(0,10)+'/ ：\n'+
+        '  arch_analysis_*.json（典型 19 KB）\n'+
+        '  figure_trace_*.md\n'+
+        '  innovation_evaluation_*.md'});
+  }
+
+  if(hc){
+    var a3f=['code_a3','a2_a3'].concat(hi?['a4_a3']:[]);
+    ss.push({ph:'A3',active:['A3'],flows:a3f,
+      t:'Agent 3 — 加载代码并注入上下文',
+      x:'FileSelector：最多 12 个关键文件，优先级顺序：\n'+
+        '  model_main > loss > decoder > backbone > config > train\n\n'+
+        '注入 Claude 提示词的上下文：\n'+
+        '  来自 Agent 2 的 SOTA 摘要（'+d+' 排行榜 + 差距数据）\n'+
+        (hi?'  来自 Agent 4 的 structure_hint（骨干网络 + 模块映射）\n':'')+
+        '  最大代码上下文：5 000 行（跨所选文件）\n\n'+
+        '输入模式：GitHub URL 或本地目录上传'});
+
+    ss.push({ph:'A3',active:['A3'],flows:[],
+      t:'Agent 3 — AST 静态分析',
+      x:'ArchExtractor（ast.parse，无需执行代码）：\n'+
+        '  骨干网络检测  15 个标准名称（关键词字典匹配）\n'+
+        '  Neck 检测     FPN / BiFPN / ASPP / PPM 变体\n'+
+        '  自定义模块    具有创新提示名的 nn.Module 子类\n\n'+
+        'LossExtractor：\n'+
+        '  14 种损失模式 → 名称 + 权重系数 + is_auxiliary 标志\n\n'+
+        'ConfigExtractor：\n'+
+        '  YAML / Python → batch_size, lr, optimizer, scheduler, input_size'});
+
+    ss.push({ph:'A3',active:['A3'],flows:[],
+      t:'Agent 3 — Claude 深度语义分析（6 条强制规则）',
+      x:'CodeInterpreter（max_tokens=8 000，最多重试 2 次）\n\n'+
+        '必须输出字段：\n'+
+        '  file_analysis[]     每个文件的角色 + 关键类（含行号）\n'+
+        '  loss_analysis       完整公式 + 每项权重 + 源码位置\n'+
+        '  train_config        bs / lr / optimizer / scheduler / input_size\n'+
+        '  suggestions[]       >= 5 条，每条包含：\n'+
+        '                        问题（文件:行号）、解决方案、参考文献\n'+
+        '                        代码提示、预计收益\n'+
+        '  sota_gap_analysis   预测 Sm 范围 + 按组件分解的差距'});
+
+    if(hi){
+      ss.push({ph:'A3',active:['A3'],flows:[],
+        t:'Agent 3 — 架构图与代码双向验证（TASK 2）',
+        x:'ArchCodeValidator（4 层匹配策略）：\n'+
+          '  L1  精确名称匹配              评分 100\n'+
+          '  L2  缩写展开匹配              评分 90   如 ATCN → AdaptiveTransformerConditionalNetwork\n'+
+          '  L3  关键词子集匹配            评分 60\n'+
+          '  L4  子串包含匹配              评分 40\n\n'+
+          '每模块输出：\n'+
+          '  status            verified / partial / missing\n'+
+          '  code_location     文件 : 行号\n'+
+          '  match_method      使用的匹配方法\n'+
+          '  verification_note 详细说明\n\n'+
+          '报告：arch_code_validation.md（包含一致性得分 %）'});
+    }
+
+    ss.push({ph:'A3',active:['A3'],flows:['synth'],
+      t:'Agent 3 完成 — 结果传递至主控',
+      x:'arch_summary（前 300 字符）→ SharedContext.agent3_summary\n\n'+
+        '输出已保存至 cache/agent3/'+new Date().toISOString().slice(0,10)+'/ ：\n'+
+        '  agent3_report_*.md\n'+
+        '  agent3_report_*.json\n'+
+        '  agent3_summary_*.txt\n'+
+        (hi?'  arch_code_validation_*.md\n':'')+
+        '\n所有路径记录于 SharedContext.output_paths'});
+  }
+
+  ss.push({ph:'M',active:['M'],flows:['synth'],
+    t:'主控 Agent — 分段综合报告（6 节 × 8 000 tokens）',
+    x:'SynthesisGenerator — 6 轮顺序 Claude 调用：\n\n'+
+      '  第 1 节  SOTA 精确基线         SOTA 表格 + 逐年进展\n'+
+      '  第 2 节  Top-N 方法对比        跨数据集分析 + 架构推理\n'+
+      '  第 3 节  代码架构诊断           '+(hc?'基于 Agent 3 文件级分析':'通用最佳实践指导')+'\n'+
+      '  第 4 节  差距量化               性能预测 + 按组件分解差距\n'+
+      '  第 5 节  改进路线图             >= 6 条建议，每条 7 个要素\n'+
+      '  第 6 节  行动清单               >= 10 项任务 + 3 个月里程碑计划\n\n'+
+      '总计：约 24 000 tokens  |  约 23 000 字符  |  约 72 KB'});
+
+  ss.push({ph:'OUT',active:['M','OUT'],flows:['out'],
+    t:'完成 — 最终报告已写入磁盘',
+    x:'master_report_*.md         72 KB  人类可读版\n'+
+      'master_report_*.json       结构化 JSON：\n'+
+      '  meta          session_id, agents_run, total_time_s, word_count\n'+
+      '  sections      {key: "## 标题\\n\\n内容..."}（6 个条目）\n'+
+      '  agent_status  {done: bool, error: str}  每个 Agent\n'+
+      '  all_sub_outputs  每个子 Agent 报告的路径\n\n'+
+      '位置：cache/master/'+new Date().toISOString().slice(0,10)+'/'});
+
+  return ss;
+}
+
+function bArrows(hc,hi){
+  return [
+    {id:'m_a1',  d:'M 280 66 C 280 104 101 108 101 148', base:true},
+    {id:'m_a2',  d:'M 420 66 C 420 104 335 108 335 148', base:true},
+    {id:'m_a4',  d:'M 590 66 C 590 104 720 108 720 148', base:false, si:hi},
+    {id:'a1_a2', d:'M 189 206 L 248 206', base:true},
+    {id:'a2_a3', d:'M 335 264 L 335 300', base:false, si:hc},
+    {id:'a4_a3', d:'M 711 264 C 711 290 423 290 423 300', base:false, si:hc&&hi},
+    {id:'code_a3',d:'M 189 365 L 248 365', base:false, si:hc},
+    {id:'img_a4', d:'M 720 117 L 720 148', base:false, si:hi},
+    {id:'a2_ret', d:'M 335 148 C 335 104 420 86 420 66', base:true, ret:true},
+    {id:'a3_ret', d:'M 335 300 C 335 260 420 180 420 66', base:false, si:hc, ret:true},
+    {id:'a4_ret', d:'M 720 148 C 720 104 590 86 590 66', base:false, si:hi&&!hc, ret:true},
+    {id:'synth',  d:'M 420 66 L 420 452', base:true},
+    {id:'out',    d:'M 420 452 L 420 452', base:true},
+  ];
+}
+
+var ARROWS=[];
+
+function init(){
+  STEPS=bSteps(S.hC,S.hI);
+  ARROWS=bArrows(S.hC,S.hI);
+  riBadges();
+  rCards(-1);
+  rArrows([]);
+  rDetail(-1);
+  uBtns();
+}
+
+function riBadges(){
+  document.getElementById('ibC').className='ib'+(S.hC?'':' off');
+  document.getElementById('ibI').className='ib'+(S.hI?'':' off');
+}
+
+function rArrows(aIds){
+  var svg=document.getElementById('svgL');
+  svg.querySelectorAll('.ap,.fd').forEach(function(e){e.remove()});
+  ARROWS.forEach(function(a){
+    if(!a.base && !a.si) return;
+    var act=aIds.indexOf(a.id)>=0;
+    var p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d',a.d);p.setAttribute('fill','none');
+    var sc=act?(a.ret?'#3b6d11':'#185fa5'):'var(--color-border-secondary)';
+    p.setAttribute('stroke',sc);
+    p.setAttribute('stroke-width',act?'1.5':'0.55');
+    p.setAttribute('stroke-opacity',act?'0.85':'0.28');
+    if(!act) p.setAttribute('stroke-dasharray','4 3');
+    if(!a.ret) p.setAttribute('marker-end','url(#mh)');
+    p.setAttribute('class','ap');
+    svg.appendChild(p);
+    if(act){
+      var dot=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      dot.setAttribute('r','4');dot.setAttribute('fill',a.ret?'#3b6d11':'#185fa5');
+      dot.setAttribute('opacity','0.9');dot.setAttribute('class','fd');
+      var am=document.createElementNS('http://www.w3.org/2000/svg','animateMotion');
+      am.setAttribute('dur',a.ret?'1.9s':'1.4s');am.setAttribute('repeatCount','indefinite');
+      am.setAttribute('path',a.d);dot.appendChild(am);svg.appendChild(dot);
+    }
+  });
+}
+
+var AKEYS=['M','A1','A2','A3','A4'];
+var STATUS_TEXT={running:'运行中',done:'完成',skip:'跳过',idle:'空闲'};
+
+function rCards(idx){
+  var step=idx>=0?STEPS[idx]:null;
+  var active=step?(step.active||[]):[];
+  var ever={};
+  if(idx>=0) STEPS.slice(0,idx+1).forEach(function(s){(s.active||[]).forEach(function(k){ever[k]=true})});
+  var will={};
+  STEPS.forEach(function(s){(s.active||[]).forEach(function(k){will[k]=true})});
+
+  AKEYS.forEach(function(k){
+    var el=document.getElementById('ac'+k);
+    var sc=document.getElementById('sc'+k);
+    var stEl=document.getElementById('st'+k);
+    var dtEl=document.getElementById('dt'+k);
+    var slEl=document.getElementById('sl'+k);
+    if(!el) return;
+    var isAct=active.indexOf(k)>=0;
+    var wasDone=!isAct&&ever[k];
+    var skipped=!will[k];
+    el.className='ac'+(skipped?' skipped':'');
+    if(isAct){el.style.borderColor=COL[k]||'#185fa5';el.style.borderWidth='1px';el.style.background=BG[k]||'';}
+    else{el.style.borderColor='var(--color-border-tertiary)';el.style.borderWidth='0.5px';el.style.background='var(--color-background-primary)';}
+    if(sc) sc.style.display=isAct?'block':'none';
+    var cfg=isAct?{bg:BG[k],c:COL[k],dot:COL[k],txt:'运行中'}:
+            wasDone?{bg:'var(--color-background-success)',c:'var(--color-text-success)',dot:'var(--color-text-success)',txt:'完成'}:
+            skipped?{bg:'var(--color-background-secondary)',c:'var(--color-text-tertiary)',dot:'var(--color-border-tertiary)',txt:'跳过'}:
+                    {bg:'var(--color-background-secondary)',c:'var(--color-text-tertiary)',dot:'var(--color-border-tertiary)',txt:'空闲'};
+    if(stEl){stEl.style.background=cfg.bg;stEl.style.color=cfg.c;}
+    if(dtEl){dtEl.style.background=cfg.dot;dtEl.style.animation=isAct?'dp 0.9s infinite':'none';}
+    if(slEl) slEl.textContent=cfg.txt;
+  });
+
+  var ob=document.getElementById('outB'),ok=document.getElementById('outOK');
+  var outDone=idx>=0&&STEPS.slice(0,idx+1).some(function(s){return s.ph==='OUT'});
+  if(ob) ob.className='ob'+(outDone?' lit':'');
+  if(ok) ok.style.display=outDone?'block':'none';
+
+  var ibC=document.getElementById('ibC'),ibI=document.getElementById('ibI');
+  var flows=step?(step.flows||[]):[];
+  if(ibC) ibC.className='ib'+(S.hC?'':' off')+(flows.indexOf('code_a3')>=0?' hl':'');
+  if(ibI) ibI.className='ib'+(S.hI?'':' off')+(flows.indexOf('img_a4')>=0?' hl':'');
+}
+
+function rDetail(idx){
+  var p=document.getElementById('detP');
+  if(idx<0||!STEPS[idx]){p.innerHTML='<div class="dp-empty">点击「开始」逐步演示数据流程</div>';return;}
+  var s=STEPS[idx];
+  var bgc={'M':'var(--color-background-info)','A1':'var(--color-background-info)','A2':'var(--color-background-success)',
+           'A3':'var(--color-background-warning)','A4':'var(--color-background-warning)',
+           'OUT':'var(--color-background-danger)','idle':'var(--color-background-secondary)'};
+  var tc={'M':'var(--color-text-info)','A1':'var(--color-text-info)','A2':'var(--color-text-success)',
+          'A3':'var(--color-text-warning)','A4':'var(--color-text-warning)',
+          'OUT':'var(--color-text-danger)','idle':'var(--color-text-tertiary)'};
+  var ph=s.ph||'idle';
+  var txt=s.x.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  p.innerHTML='<div class="dp-step" style="background:'+bgc[ph]+';color:'+tc[ph]+'">第 '+(idx+1)+' 步 / 共 '+STEPS.length+' 步</div>'+
+    '<div class="dp-title">'+s.t+'</div>'+
+    '<div class="dp-detail">'+txt+'</div>';
+}
+
+function apply(idx){
+  S.idx=idx;
+  var step=idx>=0?STEPS[idx]:null;
+  rArrows(step?(step.flows||[]):[]);
+  rCards(idx);
+  rDetail(idx);
+  uBtns();
+}
+
+function uBtns(){
+  document.getElementById('bPrev').disabled=S.idx<0;
+  document.getElementById('bNext').disabled=S.idx>=STEPS.length-1;
+  var pct=STEPS.length>0?Math.max(0,S.idx+1)/STEPS.length*100:0;
+  document.getElementById('pFill').style.width=pct+'%';
+  document.getElementById('pTxt').textContent=Math.max(0,S.idx+1)+' / '+STEPS.length;
+  var bp=document.getElementById('bPlay');
+  if(S.idx<0){bp.textContent='▶ 开始';bp.className='btn btn-p';}
+  else if(S.idx>=STEPS.length-1){bp.textContent='↺ 重播';bp.className='btn';}
+  else if(S.play){bp.textContent='⏸ 暂停';bp.className='btn';}
+  else{bp.textContent='▶ 继续';bp.className='btn btn-p';}
+}
+
+function tP(){
+  if(S.idx>=STEPS.length-1){reset();setTimeout(go,60);return;}
+  if(S.idx<0){go();return;}
+  if(S.play){S.play=false;clearTimeout(S.tmr);uBtns();}else go();
+}
+function go(){S.play=true;uBtns();tick();}
+function tick(){if(!S.play)return;if(S.idx>=STEPS.length-1){S.play=false;uBtns();return;}apply(S.idx+1);S.tmr=setTimeout(tick,2100);}
+function sP(){S.play=false;clearTimeout(S.tmr);apply(Math.max(-1,S.idx-1));}
+function sN(){S.play=false;clearTimeout(S.tmr);if(S.idx<STEPS.length-1)apply(S.idx+1);}
+function reset(){S.play=false;clearTimeout(S.tmr);apply(-1);}
+function setD(d){S.dom=d;document.getElementById('sgCOD').className='seg'+(d==='COD'?' on':'');document.getElementById('sgSOD').className='seg'+(d==='SOD'?' on':'');reinit();}
+function tgC(){S.hC=!S.hC;var on=S.hC;document.getElementById('ttC').style.background=on?'#185fa5':'var(--color-border-tertiary)';document.getElementById('thC').style.left=on?'14px':'2px';document.getElementById('tlC').style.color=on?'var(--color-text-info)':'var(--color-text-tertiary)';reinit();}
+function tgI(){S.hI=!S.hI;var on=S.hI;document.getElementById('ttI').style.background=on?'#854f0b':'var(--color-border-tertiary)';document.getElementById('thI').style.left=on?'14px':'2px';document.getElementById('tlI').style.color=on?'var(--color-text-warning)':'var(--color-text-tertiary)';reinit();}
+function reinit(){S.play=false;clearTimeout(S.tmr);S.idx=-1;init();}
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+# ============================================================
+# NovaSight .gitignore
+# ============================================================
+
+# ── CRITICAL: Secrets & Environment ─────────────────────────
+.env
+.env.local
+.env.*.local
+sod_cod_assistant/.env
+
+# ── Python ──────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.Python
+pip-wheel-metadata/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+Lib/
+Scripts/
+
+# ── Node.js / Next.js ────────────────────────────────────────
+node_modules/
+.next/
+out/
+.vercel/
+*.tsbuildinfo
+next-env.d.ts
+
+# ── Cache & Generated Data ───────────────────────────────────
+# Agent output cache (can be large and regenerated)
+sod_cod_assistant/cache/pdfs/
+sod_cod_assistant/cache/sota_cache/
+sod_cod_assistant/cache/agent1/
+sod_cod_assistant/cache/agent2/
+sod_cod_assistant/cache/agent3/
+sod_cod_assistant/cache/agent4/
+sod_cod_assistant/cache/master/
+
+# Keep the cache directory structure but ignore data files
+!sod_cod_assistant/cache/.gitkeep
+
+# ── Logs ─────────────────────────────────────────────────────
+*.log
+logs/
+*.log.*
+
+# ── OS files ─────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ── IDE / Editor ─────────────────────────────────────────────
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+
+# ── Uploaded files (user data) ───────────────────────────────
+sod_cod_assistant/uploads/
+*.pdf
+
+# ── Test artifacts ───────────────────────────────────────────
+.coverage
+htmlcov/
+coverage.xml
+*.cover
+
+# ── Misc ─────────────────────────────────────────────────────
+*.tmp
+*.bak
+*.orig
